@@ -13,6 +13,9 @@ DIFFUTILS_LICENSE_FILES = COPYING
 DIFFUTILS_CPE_ID_VENDOR = gnu
 DIFFUTILS_CONF_ENV += gl_cv_func_strcasecmp_works=yes
 
+# We're patching m4/stack-direction.m4
+DIFFUTILS_AUTORECONF = YES
+
 # Since glibc >= 2.26, don't try to use getopt_long replacement bundled
 # with diffutils. It will conflict with the one from glibc.
 ifeq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
