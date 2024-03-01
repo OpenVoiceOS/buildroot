@@ -17,7 +17,10 @@ HOST_GO_BOOTSTRAP_STAGE1_ROOT = $(HOST_DIR)/lib/go-$(GO_BOOTSTRAP_STAGE1_VERSION
 
 # The go build system is not compatible with ccache, so use
 # HOSTCC_NOCCACHE. See https://github.com/golang/go/issues/11685.
+<<<<<<< HEAD
 # CFLAGS and GO_CCFLAGS have no effect, so overwrite CC directly.
+=======
+>>>>>>> 9120e25ed1 (Fix merge mistakes and use podman v4.9.3 patched instead of dev sha)
 HOST_GO_BOOTSTRAP_STAGE1_MAKE_ENV = \
 	GOOS=linux \
 	GOROOT_FINAL="$(HOST_GO_BOOTSTRAP_STAGE1_ROOT)" \
