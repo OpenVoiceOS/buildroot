@@ -119,13 +119,4 @@ define PODMAN_HELPERS
 endef
 PODMAN_POST_INSTALL_TARGET_HOOKS += PODMAN_HELPERS
 
-HOST_PODMAN_BUILD_TARGETS = cmd/podman
-HOST_PODMAN_DEPENDENCIES += host-libglib2 host-libgpgme
-HOST_PODMAN_LDFLAGS = $(PODMAN_LDFLAGS)
-HOST_PODMAN_GO_ENV = GOFLAGS="-mod=mod" GOPROXY=direct
-HOST_PODMAN_TAGS = exclude_graphdriver_zfs \
-		exclude_graphdriver_btrfs \
-		exclude_graphdriver_vfs
-
 $(eval $(golang-package))
-$(eval $(host-golang-package))
