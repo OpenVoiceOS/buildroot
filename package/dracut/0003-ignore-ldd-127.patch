@@ -1,18 +1,17 @@
-From 298826dd718fd48f564170e727fecfc2dcd94118 Mon Sep 17 00:00:00 2001
-From: Adam Duskett <adam.duskett@amarulasolutions.com>
-Date: Thu, 9 Nov 2023 14:38:03 -0700
-Subject: [PATCH] test
+From b363ce9ae75d03f64315952697e5b1b3a455dc13 Mon Sep 17 00:00:00 2001
+From: j1nx <p.steenbergen@j1nx.nl>
+Date: Mon, 30 Dec 2024 10:48:17 +0000
+Subject: [PATCH 1/1] ignore ldd 127
 
-Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
 ---
  src/install/dracut-install.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/install/dracut-install.c b/src/install/dracut-install.c
-index 96b20e9..88f68e8 100644
+index 3a150065..7e802c4e 100644
 --- a/src/install/dracut-install.c
 +++ b/src/install/dracut-install.c
-@@ -333,7 +333,7 @@ normal_copy:
+@@ -406,7 +406,7 @@ normal_copy:
                                      && no_xattr == false) ? "--preserve=mode,xattr,timestamps,ownership" : "--preserve=mode,timestamps,ownership";
          if (pid == 0) {
                  execlp("cp", "cp", "--reflink=auto", "--sparse=auto", preservation, "-fL", src, dst, NULL);
@@ -21,15 +20,15 @@ index 96b20e9..88f68e8 100644
          }
  
          while (waitpid(pid, &ret, 0) == -1) {
-@@ -539,7 +539,7 @@ static int resolve_deps(const char *src)
+@@ -661,7 +661,7 @@ static int resolve_deps(const char *src)
                  dup2(fds[1], 2);
                  putenv("LC_ALL=C");
-                 execlp(ldd, ldd, fullsrcpath, (char *)NULL);
+                 execvp(cmdline[0], cmdline);
 -                _exit(errno == ENOENT ? 127 : 126);
 +                _exit(errno == 126);
          }
          close(fds[1]);
  
 -- 
-2.41.0
+2.43.0
 

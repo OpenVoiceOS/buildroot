@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-DRACUT_VERSION = 059
-DRACUT_SITE = $(call github,dracutdevs,dracut,$(DRACUT_VERSION))
+DRACUT_VERSION = 00902e25bb4b2a25a03c9ddec6b4c4c9f802650d
+DRACUT_SITE = $(call github,dracut-ng,dracut-ng,$(DRACUT_VERSION))
 DRACUT_LICENSE = GPL-2.0
 DRACUT_LICENSE_FILES = COPYING
 DRACUT_CPE_ID_VENDOR = dracut_project
@@ -28,7 +28,8 @@ HOST_DRACUT_DEPENDENCIES += \
 	host-coreutils \
 	host-cpio \
 	host-gzip \
-	host-util-linux
+	host-util-linux \
+	host-prelink-cross
 
 DRACUT_DEPENDENCIES += \
 	host-dracut \
@@ -72,7 +73,8 @@ DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_UNEEDED_MODULES
 ifeq ($(BR2_PACKAGE_SYSTEMD),y)
 DRACUT_DEPENDENCIES += systemd
 DRACUT_MAKE_ENV += SYSTEMCTL=$(HOST_DIR)/bin/systemctl
-DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
+DRACUT_CONF_OPTS += --systemdsystemunitdir=$(TARGET_DIR)/usr/lib/systemd/system
+#DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
 define DRACUT_REMOVE_SYSTEMD_FILES
 	# Do not start dracut services normally. Dracut will enable the dracut
 	# services during image creation.
@@ -81,18 +83,25 @@ endef
 DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_SYSTEMD_FILES
 endif
 
+define HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
+	mv $(HOST_DIR)/bin/dracut $(HOST_DIR)/bin/dracut.real
+	install -D -m 0755 $(HOST_DRACUT_PKGDIR)/dracut_wrapper \
+		$(HOST_DIR)/bin/dracut
+endef
+HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
+
 # Install the dracut-install wrapper which exports the proper LD_LIBRARY_PATH
 # when called.
-define HOST_DRACUT_INSTALL_WRAPPER
-	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/dracut-install.in \
-		$(HOST_DIR)/bin/dracut-install
-endef
-HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_INSTALL_WRAPPER
+#define HOST_DRACUT_INSTALL_WRAPPER
+#	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/dracut-install.in \
+#		$(HOST_DIR)/bin/dracut-install
+#endef
+#HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_INSTALL_WRAPPER
 
-define HOST_DRACUT_INSTALL_CROSS_LDD
-	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/cross-ldd $(TARGET_CROSS)ldd
-endef
-HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_INSTALL_CROSS_LDD
+#define HOST_DRACUT_INSTALL_CROSS_LDD
+#	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/cross-ldd $(TARGET_CROSS)ldd
+#endef
+#HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_INSTALL_CROSS_LDD
 
 ifeq ($(BR2_INIT_BUSYBOX),y)
 # Dracut does not support busybox init (systemd init is assumed to work
