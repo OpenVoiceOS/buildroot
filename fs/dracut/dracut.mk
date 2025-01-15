@@ -34,7 +34,7 @@ ROOTFS_DRACUT_FS_ENV = \
 	DRACUT_INSTALL="$(HOST_DIR)/bin/dracut-install" \
 	DRACUT_INSTALL_PATH="$(ROOTFS_DRACUT_TARGET_DIR)/usr/bin:$(ROOTFS_DRACUT_TARGET_DIR)/usr/sbin:$(ROOTFS_DRACUT_TARGET_DIR)/usr/lib" \
 	DRACUT_LDCONFIG=/bin/true \
-	DRACUT_LDD="$(TARGET_CROSS)ldd --root=$(ROOTFS_DRACUT_TARGET_DIR)/" \
+	DRACUT_LDD="$(TARGET_CROSS)xldd --root=$(ROOTFS_DRACUT_TARGET_DIR)/" \
 	DRACUT_MODPROBE="$(HOST_DIR)/sbin/modprobe" \
 	DRACUT_PATH="/bin /sbin" \
 	STRIP_CMD="$(TARGET_CROSS)strip" \
@@ -42,7 +42,6 @@ ROOTFS_DRACUT_FS_ENV = \
 
 ROOTFS_DRACUT_MKFS_CONF_OPTS = \
 	--force \
-	--fstab \
 	--noprefix \
 	--sysroot=$(ROOTFS_DRACUT_TARGET_DIR) \
 	--tmpdir=$(ROOTFS_DRACUT_DIR)/rootfs.dracut.tmp \
@@ -209,6 +208,7 @@ ROOTFS_DRACUT_FS_ENV += \
 	dbussystemconfdir=/etc/dbus-1/system.d \
 	dbussystemservicesconfdir=/etc/dbus-1/system-services \
 	dbussystemservicesconfdir=$(TARGET_DIR)/etc/dbus-1/system-services \
+#	dracutsysrootdir=$(TARGET_DIR) \
 	SYSTEMCTL="$(HOST_DIR)/bin/systemctl" \
 	systemctlpath="$(HOST_DIR)/bin/systemctl" \
 	systemdsystemconfdir="/etc/systemd/system" \
