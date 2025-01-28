@@ -4,13 +4,21 @@
 #
 ################################################################################
 
-DRACUT_VERSION = 00902e25bb4b2a25a03c9ddec6b4c4c9f802650d
+DRACUT_VERSION = 800a43b18809c4fc460489b6292653e1a1656469
 DRACUT_SITE = $(call github,dracut-ng,dracut-ng,$(DRACUT_VERSION))
 DRACUT_LICENSE = GPL-2.0
 DRACUT_LICENSE_FILES = COPYING
-DRACUT_CPE_ID_VENDOR = dracut_project
+DRACUT_CPE_ID_VALID = YES
 
 HOST_DRACUT_DEPENDENCIES = host-pkgconf host-kmod host-cross-ldd
+DRACUT_DEPENDENCIES = host-dracut kmod pkgconf util-linux
+
+DRACUT_MAKE_ENV += \
+	CC="$(TARGET_CC)" \
+	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)" \
+	dracutsysrootdir=$(TARGET_DIR)
+
+DRACUT_CONF_OPTS += --disable-dracut-cpio
 
 define HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
 	mv $(HOST_DIR)/bin/dracut $(HOST_DIR)/bin/dracut.real
@@ -20,27 +28,6 @@ define HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
 	install -D -m 0755 $(@D)/dracut_wrapper $(HOST_DIR)/bin/dracut
 endef
 HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
-
-# Dracut requires realpath from coreutils
-HOST_DRACUT_DEPENDENCIES += \
-	host-pkgconf \
-	host-kmod \
-	host-coreutils \
-	host-cpio \
-	host-gzip \
-	host-util-linux \
-	host-cross-ldd
-
-DRACUT_DEPENDENCIES += \
-	host-dracut \
-	kmod \
-	pkgconf \
-	util-linux
-
-DRACUT_MAKE_ENV += \
-	CC="$(TARGET_CC)" \
-	PKG_CONFIG="$(HOST_PKG_CONFIG_PATH)" \
-	dracutsysrootdir=$(TARGET_DIR)
 
 # When using uClibc or musl, there must be "ld-uClibc.so.1" or
 # "ld-musl-x.so" symlinks, respectively - else the init process cannot
@@ -52,66 +39,6 @@ define HOST_DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
 		$(HOST_DIR)/lib/dracut/modules.d/05libc-links/module-setup.sh
 endef
 HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
-
-define DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
-        $(INSTALL) -D -m 0755 package/dracut/merged-usr-module-setup.sh \
-                $(TARGET_DIR)/lib/dracut/modules.d/0000-merged-usr/module-setup.sh
-        $(INSTALL) -D -m 0755 package/dracut/libc-links-module-setup.sh \
-                $(TARGET_DIR)/lib/dracut/modules.d/05libc-links/module-setup.sh
-endef
-DRACUT_POST_INSTALL_TARGET_HOOKS += DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
-
-define DRACUT_LINUX_CONFIG_FIXUPS
-	$(call KCONFIG_ENABLE_OPT,CONFIG_BLK_DEV_INITRD)
-	$(call KCONFIG_ENABLE_OPT,CONFIG_DEVTMPFS)
-endef
-
-ifeq ($(BR2_PACKAGE_BASH),y)
-DRACUT_DEPENDENCIES += \
-	bash \
-	bash-completion
-endif
-
-# gensplash is gentoo specific
-define DRACUT_REMOVE_UNEEDED_MODULES
-	$(RM) -r $(TARGET_DIR)/usr/lib/dracut/modules.d/50gensplash
-endef
-DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_UNEEDED_MODULES
-
-ifeq ($(BR2_PACKAGE_SYSTEMD),y)
-DRACUT_DEPENDENCIES += systemd
-DRACUT_MAKE_ENV += SYSTEMCTL=$(HOST_DIR)/bin/systemctl
-#DRACUT_CONF_OPTS += --systemdsystemunitdir=$(TARGET_DIR)/usr/lib/systemd/system
-DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
-DRACUT_CONF_OPTS += --disable-dracut-cpio
-HOST_DRACUT_CONF_OPTS += --systemdsystemunitdir=$(HOST_DIR)/usr/lib/systemd/system
-define DRACUT_REMOVE_SYSTEMD_FILES
-	# Do not start dracut services normally. Dracut will enable the dracut
-	# services during image creation.
-	find $(TARGET_DIR)/etc/systemd/system -name "*dracut*.service" -delete
-endef
-DRACUT_TARGET_FINALIZE_HOOKS += DRACUT_REMOVE_SYSTEMD_FILES
-endif
-
-# Install the dracut-install wrapper which exports the proper LD_LIBRARY_PATH
-# when called.
-#define HOST_DRACUT_INSTALL_WRAPPER
-#	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/dracut-install.in \
-#		$(HOST_DIR)/bin/dracut-install
-#endef
-#HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_INSTALL_WRAPPER
-define HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
-#	mv $(HOST_DIR)/bin/dracut $(HOST_DIR)/bin/dracut.real
-#	sed -e "s%@@TARGET_CROSS@@%$(TARGET_CROSS)%" \
-#		$(HOST_DRACUT_PKGDIR)/dracut_wrapper.in > \
-#		$(@D)/dracut_wrapper
-#	install -D -m 0755 $(@D)/dracut_wrapper $(HOST_DIR)/bin/dracut
-
-	$(INSTALL) -D -m 755 $(DRACUT_PKGDIR)/dracut-install.in \
-               $(HOST_DIR)/bin/dracut-install
-endef
-HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_WRAPPER_SCRIPT
-
 
 ifeq ($(BR2_INIT_BUSYBOX),y)
 # Dracut does not support busybox init (systemd init is assumed to work
@@ -128,6 +55,11 @@ define HOST_DRACUT_POST_INSTALL_BUSYBOX_INIT_MODULE
 		$(HOST_DIR)/lib/dracut/modules.d/05busybox-init/module-setup.sh
 endef
 HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_BUSYBOX_INIT_MODULE
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEMD),y)
+HOST_DRACUT_CONF_OPTS += --systemdsystemunitdir=$(HOST_DIR)/usr/lib/systemd/system
+DRACUT_CONF_OPTS += --systemdsystemunitdir=/usr/lib/systemd/system
 endif
 
 $(eval $(autotools-package))

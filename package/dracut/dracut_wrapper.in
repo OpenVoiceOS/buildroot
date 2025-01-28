@@ -41,4 +41,8 @@ export DRACUT_LDD
 export DRACUT_INSTALL="${topdir}/lib/dracut/dracut-install"
 export DRACUT_LDCONFIG=/bin/true
 export dracutbasedir="${topdir}/lib/dracut"
-exec "${topdir}/bin/dracut.real" "${@}"
+(exec "${topdir}/bin/dracut.real" "${@}")
+
+if [ -n "${DRACUT_LDD}" ]; then
+	rm -f "${DRACUT_LDD}"
+fi

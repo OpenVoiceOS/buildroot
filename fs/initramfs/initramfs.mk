@@ -21,6 +21,9 @@
 
 rootfs-initramfs: linux-rebuild-with-initramfs
 
+rootfs-initramfs-show-depends:
+	@echo rootfs-cpio
+
 .PHONY: rootfs-initramfs rootfs-initramfs-show-depends
 
 ifeq ($(BR2_TARGET_ROOTFS_INITRAMFS),y)
@@ -30,16 +33,4 @@ endif
 # Not using the rootfs infra, so fake the variables
 ROOTFS_INITRAMFS_NAME = rootfs-initramfs
 ROOTFS_INITRAMFS_TYPE = rootfs
-ROOTFS_INITRAMFS_DEPENDENCIES = linux
-
-ifeq ($(BR2_TARGET_ROOTFS_INITRAMFS_CPIO),y)
-ROOTFS_INITRAMFS_DEPENDENCIES += rootfs-cpio
-rootfs-initramfs-show-depends:
-	@echo rootfs-cpio
-endif
-
-ifeq ($(BR2_TARGET_ROOTFS_INITRAMFS_DRACUT),y)
-ROOTFS_INITRAMFS_DEPENDENCIES += rootfs-dracut
-rootfs-initramfs-show-depends:
-	@echo rootfs-dracut
-endif
+ROOTFS_INITRAMFS_DEPENDENCIES = rootfs-cpio linux

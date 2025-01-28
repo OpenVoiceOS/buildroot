@@ -14,7 +14,7 @@ config BR2_PACKAGE_DRACUT
 	  it with the dracut framework, usually found in
 	  /usr/lib/dracut/modules.d.
 
-	  https://github.com/dracutdevs/dracut
+	  https://github.com/dracut-ng/dracut-ng
 
 comment "dracut needs udev /dev management and a toolchain w/ dynamic library"
 	depends on !BR2_PACKAGE_HAS_UDEV
