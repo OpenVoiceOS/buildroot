@@ -4,10 +4,9 @@
 #
 ################################################################################
 
-# Update FFMPEG_CPE_ID_VERSION if needed
-FFMPEG_VERSION = n6.1.2-27-ge16ff06adb
-FFMPEG_SITE = https://git.ffmpeg.org/ffmpeg.git
-FFMPEG_SITE_METHOD = git
+FFMPEG_VERSION = 7.1
+FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.xz
+FFMPEG_SITE = https://ffmpeg.org/releases
 FFMPEG_INSTALL_STAGING = YES
 FFMPEG_CPE_ID_VERSION = 6.1.2
 
@@ -34,7 +33,6 @@ FFMPEG_CONF_OPTS = \
 	--disable-gray \
 	--enable-swscale-alpha \
 	--disable-small \
-	--disable-crystalhd \
 	--disable-dxva2 \
 	--enable-runtime-cpudetect \
 	--disable-hardcoded-tables \
@@ -281,6 +279,13 @@ FFMPEG_CONF_OPTS += --enable-vdpau
 FFMPEG_DEPENDENCIES += libvdpau
 else
 FFMPEG_CONF_OPTS += --disable-vdpau
+endif
+
+ifeq ($(BR2_PACKAGE_VULKAN_HEADERS),y)
+FFMPEG_CONF_OPTS += --enable-vulkan
+FFMPEG_DEPENDENCIES += vulkan-headers
+else
+FFMPEG_CONF_OPTS += --disable-vulkan
 endif
 
 ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
