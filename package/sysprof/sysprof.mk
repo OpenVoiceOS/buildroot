@@ -11,6 +11,7 @@ SYSPROF_SITE = https://download.gnome.org/sources/sysprof/$(SYSPROF_VERSION_MAJO
 SYSPROF_LICENSE = GPL-3.0+
 SYSPROF_LICENSE_FILES = COPYING
 SYSPROF_DEPENDENCIES = libglib2 libdex libunwind json-glib polkit
+SYSPROF_INSTALL_STAGING = YES
 SYSPROF_CONF_OPTS = \
 	-Ddevelopment=false \
 	-Dexamples=false \

@@ -4,9 +4,8 @@
 #
 ################################################################################
 
-LIBCAMERA_APPS_VERSION = 1.5.0
-LIBCAMERA_APPS_SOURCE = rpicam-apps-$(LIBCAMERA_APPS_VERSION).tar.xz
-LIBCAMERA_APPS_SITE = https://github.com/raspberrypi/rpicam-apps/releases/download/v$(LIBCAMERA_APPS_VERSION)
+LIBCAMERA_APPS_VERSION = 1.6.0
+LIBCAMERA_APPS_SITE = $(call github,raspberrypi,rpicam-apps,v$(LIBCAMERA_APPS_VERSION))
 LIBCAMERA_APPS_LICENSE = BSD-2-Clause
 LIBCAMERA_APPS_LICENSE_FILES = license.txt
 LIBCAMERA_APPS_DEPENDENCIES = \

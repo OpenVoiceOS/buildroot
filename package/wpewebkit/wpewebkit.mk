@@ -5,7 +5,7 @@
 ################################################################################
 
 # The middle number is even for stable releases, odd for development ones.
-WPEWEBKIT_VERSION = 2.44.4
+WPEWEBKIT_VERSION = 2.46.6
 WPEWEBKIT_SITE = https://wpewebkit.org/releases
 WPEWEBKIT_SOURCE = wpewebkit-$(WPEWEBKIT_VERSION).tar.xz
 WPEWEBKIT_INSTALL_STAGING = YES
@@ -27,8 +27,8 @@ WPEWEBKIT_CONF_OPTS = \
 	-DENABLE_DOCUMENTATION=OFF \
 	-DENABLE_INTROSPECTION=OFF \
 	-DENABLE_MINIBROWSER=OFF \
-	-DENABLE_WEB_RTC=OFF \
-	-DUSE_ATK=OFF
+	-DUSE_ATK=OFF \
+	-DUSE_SYSTEM_SYSPROF_CAPTURE=NO
 
 ifeq ($(BR2_PACKAGE_WPEWEBKIT_SANDBOX),y)
 WPEWEBKIT_CONF_OPTS += \
@@ -144,7 +144,7 @@ WPEWEBKIT_CONF_OPTS += \
 	-DENABLE_JIT=OFF \
 	-DENABLE_C_LOOP=ON \
 	-DENABLE_SAMPLING_PROFILER=OFF \
-	-DENABLE_WEBASSEMBLY=OFF
+	-USE_SYSTEM_SYSPROF_CAPTURE=NO
 endif
 
 $(eval $(cmake-package))
