@@ -6,8 +6,7 @@
 
 # When updating the version here, also update aardvark-dns in lockstep
 NETAVARK_VERSION = v1.14.0
-NETAVARK_SITE = https://github.com/containers/netavark
-NETAVARK_SITE_METHOD = git
+NETAVARK_SITE = $(call github,containers,aardvark-dns,$(AARDVARK_DNS_VERSION))
 
 NETAVARK_LICENSE = Apache-2.0
 NETAVARK_LICENSE_FILES = LICENSE
