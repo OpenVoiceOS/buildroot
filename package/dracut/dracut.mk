@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DRACUT_VERSION = 913beaf65bb82aa7efec9d735ac1f9bd3d111e16
+DRACUT_VERSION = 48e4665c97b3c71f485b95426e5bf00dae3ab1ab
 DRACUT_SITE = $(call github,dracut-ng,dracut-ng,$(DRACUT_VERSION))
 DRACUT_LICENSE = GPL-2.0
 DRACUT_LICENSE_FILES = COPYING
@@ -26,12 +26,13 @@ DRACUT_DEPENDENCIES += \
 	util-linux
 
 DRACUT_CONF_OPTS += \
-	--sysroot=$(TARGET_CC)
+	--disable-dracut-cpio \
+	--sysroot=$(TARGET_DIR)
 
 DRACUT_MAKE_ENV += \
 	CC="$(TARGET_CC)" \
 	PKG_CONFIG=$(STAGING_DIR)/usr/lib/pkgconfig \
-	sysroot=$(TARGET_CC)
+	sysroot=$(TARGET_DIR)
 
 # When using uClibc or musl, there must be "ld-uClibc.so.1" or
 # "ld-musl-x.so" symlinks, respectively - else the init process cannot
