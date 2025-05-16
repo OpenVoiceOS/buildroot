@@ -112,7 +112,6 @@ config BR2_PACKAGE_PROVIDES_UDEV
 
 config BR2_PACKAGE_SYSTEMD_BOOT
 	bool "systemd-boot"
-	depends on BR2_i386 || BR2_x86_64
 	select BR2_PACKAGE_GNU_EFI
 	select BR2_PACKAGE_SYSTEMD_EFI
 	help
@@ -161,6 +160,7 @@ config BR2_PACKAGE_SYSTEMD_BOOT_EFI_ARCH
 	string
 	default "ia32"  if BR2_i386
 	default "x64"   if BR2_x86_64
+	default "aa64"   if BR2_aarch64
 	depends on BR2_PACKAGE_SYSTEMD_BOOT
 
 config BR2_PACKAGE_SYSTEMD_EFI

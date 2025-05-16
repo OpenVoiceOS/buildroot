@@ -44,6 +44,13 @@ define HOST_DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
 		$(HOST_DIR)/lib/dracut/modules.d/05libc-links/module-setup.sh
 endef
 HOST_DRACUT_POST_INSTALL_HOOKS += HOST_DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
+define DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
+        $(INSTALL) -D -m 0755 package/dracut/merged-usr-module-setup.sh \
+                $(TARGET_DIR)/lib/dracut/modules.d/0000-merged-usr/module-setup.sh
+        $(INSTALL) -D -m 0755 package/dracut/libc-links-module-setup.sh \
+                $(TARGET_DIR)/lib/dracut/modules.d/05libc-links/module-setup.sh
+endef
+DRACUT_POST_INSTALL_TARGET_HOOKS += DRACUT_POST_INSTALL_LIBC_LINKS_MODULE
 
 define DRACUT_LINUX_CONFIG_FIXUPS
 	$(call KCONFIG_ENABLE_OPT,CONFIG_BLK_DEV_INITRD)
