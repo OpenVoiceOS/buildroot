@@ -716,7 +716,7 @@ linux-rebuild-with-initramfs:
 	$(LINUX_MAKE_ENV) $(BR2_MAKE) $(LINUX_MAKE_FLAGS) -C $(LINUX_DIR) $(LINUX_TARGET_NAME)
 	$(LINUX_APPEND_DTB)
 	# Copy the kernel image(s) to its(their) final destination
-	#$(call LINUX_INSTALL_IMAGE,$(BINARIES_DIR))
-	$(call LINUX_INSTALL_IMAGE,$(TARGET_DIR)/boot)
+	$(call LINUX_INSTALL_IMAGE,$(BINARIES_DIR))
+	#$(call LINUX_INSTALL_IMAGE,$(TARGET_DIR)/boot)
 	# If there is a .ub file copy it to the final destination
 	test ! -f $(LINUX_IMAGE_PATH).ub || cp $(LINUX_IMAGE_PATH).ub $(BINARIES_DIR)
