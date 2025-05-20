@@ -36,6 +36,10 @@ else
 MDADM_CXFLAGS += -DNO_LIBUDEV
 endif
 
+define MDADM_INSTALL_INIT_SYSTEMD
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install-systemd
+endef
+
 define MDADM_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) $(MDADM_BUILD_OPTS) mdadm mdmon
 endef
