@@ -667,6 +667,12 @@ else
 SYSTEMD_CONF_OPTS += -Defi=false
 endif
 
+ifeq ($(BR2_PACKAGE_SYSTEMD_UKIFY),y)
+SYSTEMD_CONF_OPTS += -Dukify=true
+else
+SYSTEMD_CONF_OPTS += -Dukify=false
+endif
+
 SYSTEMD_FALLBACK_HOSTNAME = $(call qstrip,$(BR2_TARGET_GENERIC_HOSTNAME))
 ifneq ($(SYSTEMD_FALLBACK_HOSTNAME),)
 SYSTEMD_CONF_OPTS += -Dfallback-hostname=$(SYSTEMD_FALLBACK_HOSTNAME)
@@ -1015,6 +1021,12 @@ HOST_SYSTEMD_CONF_OPTS = \
 	-Dlibfido2=disabled \
 	-Dpcre2=disabled \
 	-Dsysupdated=disabled
+
+ifeq ($(BR2_PACKAGE_SYSTEMD_UKIFY),y)
+HOST_SYSTEMD_CONF_OPTS += -Dukify=true
+else
+HOST_SYSTEMD_CONF_OPTS += -Dukify=false
+endif
 
 HOST_SYSTEMD_DEPENDENCIES = \
 	$(BR2_COREUTILS_HOST_DEPENDENCY) \
