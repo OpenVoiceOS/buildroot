@@ -1,0 +1,59 @@
+From 9cff48a4b10c1c2d6062e0095096642e13af980f Mon Sep 17 00:00:00 2001
+From: Thomas Devoogdt <thomas.devoogdt@barco.com>
+Date: Tue, 25 Mar 2025 11:58:18 +0100
+Subject: [PATCH] lsns: fix undefined reference to add_namespace_for_nsfd #3483
+
+Fixes:
+
+sys-utils/lsns-lsns.o: In function `read_process':
+lsns.c:(.text+0x9e8): undefined reference to `add_namespace_for_nsfd'
+collect2: error: ld returned 1 exit status
+
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+(cherry picked from commit 2ced43400f35f7bd45b29364e04166a63a06e16a)
+Upstream: https://github.com/util-linux/util-linux/pull/3484
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+---
+ sys-utils/lsns.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/sys-utils/lsns.c b/sys-utils/lsns.c
+index 2b613cf71..4c49a8b2d 100644
+--- a/sys-utils/lsns.c
++++ b/sys-utils/lsns.c
+@@ -587,7 +587,10 @@ static void add_namespace_from_sock(struct lsns *ls, pid_t pid, uint64_t fd)
+ 	if (get_namespace(ls, sb.st_ino))
+ 		goto out_nsfd;
+ 
++#ifdef USE_NS_GET_API
+ 	add_namespace_for_nsfd(ls, nsfd, sb.st_ino);
++#endif
++
+ out_nsfd:
+ 	close(nsfd);
+ out_sk:
+@@ -608,6 +611,7 @@ static void add_namespace_from_sock(struct lsns *ls __attribute__((__unused__)),
+ {
+ }
+ #endif /* HAVE_LINUX_NET_NAMESPACE_H */
++
+ /* Read namespaces open(2)ed explicitly by the process specified by `pc'. */
+ static void read_opened_namespaces(struct lsns *ls, struct path_cxt *pc, pid_t pid)
+ {
+@@ -627,11 +631,13 @@ static void read_opened_namespaces(struct lsns *ls, struct path_cxt *pc, pid_t p
+ 		if (st.st_dev == ls->nsfs_dev) {
+ 			if (get_namespace(ls, st.st_ino))
+ 				continue;
++#ifdef USE_NS_GET_API
+ 			int fd = ul_path_openf(pc, O_RDONLY, "fd/%ju", (uintmax_t) num);
+ 			if (fd >= 0) {
+ 				add_namespace_for_nsfd(ls, fd, st.st_ino);
+ 				close(fd);
+ 			}
++#endif
+ 		} else if ((st.st_mode & S_IFMT) == S_IFSOCK) {
+ 			add_namespace_from_sock(ls, pid, num);
+ 		}
+-- 
+2.43.0
+

@@ -1,0 +1,160 @@
+From 00673b424c186857ec3b3c9f7f926b739df89a1d Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Thu, 20 Mar 2025 11:57:06 +0100
+Subject: [PATCH] misc: never include wchar.h
+
+We have a portable "widechar.h" that follows --disable-widechar and
+provides portability. It is a bug to directly include libc's wchar.h
+or wctype.h.
+
+Fixes: https://github.com/util-linux/util-linux/issues/3470
+Signed-off-by: Karel Zak <kzak@redhat.com>
+(cherry picked from commit 5c0888dde3cc296d06b8243dcc78248ff90526e5)
+Upstream: https://github.com/util-linux/util-linux/pull/3471
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+---
+ disk-utils/cfdisk.c          | 6 +-----
+ include/carefulputc.h        | 5 +----
+ include/fgetwc_or_err.h      | 6 +-----
+ lib/idcache.c                | 2 +-
+ sys-utils/irqtop.c           | 7 ++-----
+ sys-utils/lsns.c             | 2 +-
+ tests/helpers/test_sysinfo.c | 2 +-
+ 7 files changed, 8 insertions(+), 22 deletions(-)
+
+diff --git a/disk-utils/cfdisk.c b/disk-utils/cfdisk.c
+index 4018f4d3d..d4057eedb 100644
+--- a/disk-utils/cfdisk.c
++++ b/disk-utils/cfdisk.c
+@@ -52,14 +52,10 @@
+ # include <ncurses/ncurses.h>
+ #endif
+ 
+-#ifdef HAVE_WIDECHAR
+-# include <wctype.h>
+-# include <wchar.h>
+-#endif
+-
+ #include "c.h"
+ #include "closestream.h"
+ #include "nls.h"
++#include "widechar.h"
+ #include "strutils.h"
+ #include "xalloc.h"
+ #include "mbsalign.h"
+diff --git a/include/carefulputc.h b/include/carefulputc.h
+index 3cc6f7ff9..c6b778bba 100644
+--- a/include/carefulputc.h
++++ b/include/carefulputc.h
+@@ -4,12 +4,9 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <ctype.h>
+-#ifdef HAVE_WIDECHAR
+-#include <wctype.h>
+-#include <wchar.h>
+-#endif
+ #include <stdbool.h>
+ 
++#include "widechar.h"
+ #include "cctype.h"
+ 
+ /*
+diff --git a/include/fgetwc_or_err.h b/include/fgetwc_or_err.h
+index 3cf926283..f6ba71c6b 100644
+--- a/include/fgetwc_or_err.h
++++ b/include/fgetwc_or_err.h
+@@ -1,13 +1,9 @@
+ #ifndef UTIL_LINUX_FGETWC_OR_ERR_H
+ #define UTIL_LINUX_FGETWC_OR_ERR_H
+ 
+-#include <stdio.h>
+-#include <wchar.h>
+-#include <errno.h>
+-
+-#include "widechar.h"
+ #include "c.h"
+ #include "nls.h"
++#include "widechar.h"
+ 
+ static inline wint_t fgetwc_or_err(FILE *stream) {
+ 	wint_t ret;
+diff --git a/lib/idcache.c b/lib/idcache.c
+index fa77e7b07..7bae76823 100644
+--- a/lib/idcache.c
++++ b/lib/idcache.c
+@@ -4,12 +4,12 @@
+  *
+  * Written by Karel Zak <kzak@redhat.com>
+  */
+-#include <wchar.h>
+ #include <pwd.h>
+ #include <grp.h>
+ #include <sys/types.h>
+ 
+ #include "c.h"
++#include "widechar.h"
+ #include "idcache.h"
+ 
+ struct identry *get_id(struct idcache *ic, unsigned long int id)
+diff --git a/sys-utils/irqtop.c b/sys-utils/irqtop.c
+index ce6a2ca5b..f05bf6bef 100644
+--- a/sys-utils/irqtop.c
++++ b/sys-utils/irqtop.c
+@@ -43,13 +43,10 @@
+ # include <ncurses/ncurses.h>
+ #endif
+ 
+-#ifdef HAVE_WIDECHAR
+-# include <wctype.h>
+-# include <wchar.h>
+-#endif
+-
+ #include <libsmartcols.h>
+ 
++#include "c.h"
++#include "widechar.h"
+ #include "closestream.h"
+ #include "cpuset.h"
+ #include "monotonic.h"
+diff --git a/sys-utils/lsns.c b/sys-utils/lsns.c
+index 6b2dcba96..2b613cf71 100644
+--- a/sys-utils/lsns.c
++++ b/sys-utils/lsns.c
+@@ -19,7 +19,6 @@
+ #include <unistd.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+-#include <wchar.h>
+ #include <libsmartcols.h>
+ #include <libmount.h>
+ # include <stdbool.h>
+@@ -43,6 +42,7 @@
+ #include "nls.h"
+ #include "xalloc.h"
+ #include "c.h"
++#include "widechar.h"
+ #include "list.h"
+ #include "closestream.h"
+ #include "optutils.h"
+diff --git a/tests/helpers/test_sysinfo.c b/tests/helpers/test_sysinfo.c
+index 1559d471f..95f50f3f6 100644
+--- a/tests/helpers/test_sysinfo.c
++++ b/tests/helpers/test_sysinfo.c
+@@ -23,12 +23,12 @@
+ #include <limits.h>
+ #include <stdint.h>
+ #include <inttypes.h>
+-#include <wchar.h>
+ #include <errno.h>
+ #include <time.h>
+ #include <sys/ioctl.h>
+ 
+ #include "c.h"
++#include "widechar.h"
+ 
+ #ifdef __linux__
+ # include <sys/mount.h>
+-- 
+2.43.0
+

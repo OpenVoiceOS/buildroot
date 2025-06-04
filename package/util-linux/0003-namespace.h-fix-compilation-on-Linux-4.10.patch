@@ -1,0 +1,62 @@
+From 8d599aa63191ed327523626ab0c86c828a6d07f6 Mon Sep 17 00:00:00 2001
+From: Thomas Devoogdt <thomas@devoogdt.com>
+Date: Mon, 7 Apr 2025 14:20:12 +0200
+Subject: [PATCH] namespace.h: fix compilation on Linux < 4.10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+sys-utils/lsns.c: In function ‘add_namespace_from_sock’:
+sys-utils/lsns.c:580:19: error: ‘SIOCGSKNS’ undeclared (first use in this function)
+  nsfd = ioctl(sk, SIOCGSKNS);
+                   ^~~~~~~~~
+
+SIOCGSKNS was added in https://github.com/torvalds/linux/commit/c62cce2caee558e18aa05c01c2fd3b40f07174f2.
+
+Fixes: https://github.com/util-linux/util-linux/issues/3502
+
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+(cherry picked from commit 10ee66ed1b08586bde42582e34355418eef33ef5)
+Upstream: https://github.com/util-linux/util-linux/pull/3506
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
+---
+ include/namespace.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/include/namespace.h b/include/namespace.h
+index 2d0a56e02..d7a078ec1 100644
+--- a/include/namespace.h
++++ b/include/namespace.h
+@@ -3,11 +3,15 @@
+  * No copyright is claimed.  This code is in the public domain; do with
+  * it what you wish.
+  *
+- * Compat code so unshare and setns can be used with older libcs
++ * Compat code to support older libcs.
+  */
+ #ifndef UTIL_LINUX_NAMESPACE_H
+ # define UTIL_LINUX_NAMESPACE_H
+ 
++/*
++ * Compat code for sched.h (unshare and setns)
++ */
++
+ # include <sched.h>
+ 
+ # ifndef CLONE_NEWNS
+@@ -53,4 +57,12 @@ static inline int setns(int fd, int nstype)
+ }
+ # endif
+ 
++/*
++ * Compat code for sockios.h
++ */
++
++# ifndef SIOCGSKNS
++#  define SIOCGSKNS 0x894C
++# endif
++
+ #endif	/* UTIL_LINUX_NAMESPACE_H */
+-- 
+2.43.0
+
